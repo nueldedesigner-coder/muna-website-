@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Velour Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Outfit:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6efe6;--card:#fff;--ink:#2a0a14;--mu:#7a5560;--line:#ecd7c0;--wine:#5a0b24;--wine2:#3d0717;--gold:#e3bd8c;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#1f050d;--card:#33091a;--ink:#fbeedd;--mu:#d3b3a6;--line:#5a2034;color-scheme:dark}}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Outfit,system-ui,sans-serif;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+h1,h2{margin:0;font-weight:800}.logo{font:700 1.8rem "Cormorant Garamond",Georgia,serif;letter-spacing:.1em}
+button,input,select,textarea{font:inherit;color:inherit}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:99px;padding:9px 16px;cursor:pointer}
+.btn.p{background:var(--wine);color:#fbeedd;border-color:var(--wine);font-weight:700}
+.btn:disabled{opacity:.5}
+input[type=text],input[type=email],input[type=password],input[type=number],input[type=tel],select,textarea{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px}
+label{display:block;font-weight:700;font-size:.88rem;margin:12px 0 4px}
+.login{min-height:100vh;display:grid;place-items:center;padding:20px}
+.lc{width:100%;max-width:380px;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:28px}
+.lc .logo{color:var(--wine);text-align:center}.lc p{color:var(--mu);text-align:center;margin:4px 0 8px}
+@media (prefers-color-scheme:dark){.lc .logo{color:var(--gold)}}
+.err{color:#c0334d;min-height:1.3em;margin:8px 0 0;font-size:.92rem}
+.app{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+.sb{background:var(--wine2);color:#fbeedd;padding:20px 14px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh}
+.sb .logo{padding:4px 10px 16px}
+.sb button,.sb a{display:block;text-align:left;border:0;background:none;color:inherit;padding:11px 14px;border-radius:12px;cursor:pointer;text-decoration:none;white-space:nowrap}
+.sb button[aria-current=true]{background:rgba(255,255,255,.16);font-weight:700}
+.sb .bt{margin-top:auto;color:var(--gold)}
+.mn{padding:18px 22px 60px;max-width:920px;width:100%}
+.top{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}.top h2{flex:1;font-size:1.7rem}
+.tb{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.tb select{width:auto}.tb input{flex:1;min-width:140px}
+.row{display:grid;grid-template-columns:64px 1fr auto;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px 12px;margin:8px 0}
+.th{width:64px;height:64px;border-radius:12px;object-fit:cover;display:grid;place-items:center;font-size:1.8rem;background:var(--line)}
+.row b{display:block}.row small{color:var(--mu)}
+.ac{display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
+.sold{display:flex;gap:6px;align-items:center;font-size:.85rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin:10px 0}
+.chk{display:flex;gap:8px;align-items:center;font-weight:400}.chk input{width:auto}
+.modal{position:fixed;inset:0;background:rgba(20,0,8,.6);display:grid;place-items:center;padding:14px;z-index:20}
+.mc{background:var(--bg);border-radius:20px;padding:20px;width:100%;max-width:520px;max-height:92vh;overflow:auto}
+.msg{color:var(--mu);min-height:1.3em}
+@media (max-width:760px){.app{grid-template-columns:1fr}.sb{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;padding:12px}.sb .logo{padding:0 8px 0 0}.sb .bt{margin:0 0 0 auto}.mn{padding:14px 14px 60px}.row{grid-template-columns:56px 1fr}.row .ac{grid-column:1/-1;justify-content:flex-start}}
+</style>
+</head>
+<body>
+<div class="login" id="login" hidden><form class="lc" id="lf"><div class="logo">VELOUR</div><p>Admin sign-in</p>
+<label for="em">Email</label><input type="email" id="em" autocomplete="username" required>
+<label for="pw">Password</label><input type="password" id="pw" autocomplete="current-password" required>
+<div class="err" id="le" role="alert"></div><button class="btn p" style="width:100%;margin-top:8px">Sign in</button>
+<p style="margin-top:14px"><a href="../" style="color:inherit">← Back to shop</a></p></form></div>
+
+<div class="app" id="app" hidden>
+<aside class="sb"><div class="logo">VELOUR</div><div id="nav" style="display:contents"></div><a href="../" target="_blank" rel="noopener">View shop ↗</a><button class="bt" id="out">Sign out</button></aside>
+<main class="mn"><div class="top"><h2 id="ttl"></h2></div><p class="msg" id="msg" role="status"></p><div id="body"></div></main></div>
+
+<div class="modal" id="modal" hidden><div class="mc" id="mc"></div></div>
+
+<script src="../config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+var $=function(i){return document.getElementById(i)};
+var sb=supabase.createClient(VELOUR.url,VELOUR.key),P=[],S={},tab="p",fc="",q="";
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function iu(u){return /^https?:|^data:/.test(u)?u:"../"+u.replace(/^\//,"")}
+function fmt(n){return "₦"+Number(n).toLocaleString("en-NG")}
+function say(m){$("msg").textContent=m;clearTimeout(say.t);say.t=setTimeout(function(){$("msg").textContent=""},4000)}
+function show(on){$("login").hidden=on;$("app").hidden=!on;if(on)load()}
+sb.auth.getSession().then(function(r){show(!!r.data.session)});
+sb.auth.onAuthStateChange(function(e,s){show(!!s)});
+$("lf").onsubmit=function(e){e.preventDefault();$("le").textContent="";sb.auth.signInWithPassword({email:$("em").value.trim(),password:$("pw").value}).then(function(r){if(r.error)$("le").textContent="Wrong email or password."})};
+$("out").onclick=function(){sb.auth.signOut()};
+function load(){return Promise.all([sb.from("products").select("*").order("category_order").order("sort"),sb.from("settings").select("value").eq("key","shop").maybeSingle()]).then(function(x){
+if(x[0].error){say("Could not load products.");return}
+P=x[0].data;S=(x[1].data&&x[1].data.value)||{whatsapp:VELOUR.whatsapp,topping_price:500,toppings:[],topping_categories:[]};render()})}
+function cats(){var o=[];P.forEach(function(r){if(o.indexOf(r.category)<0)o.push(r.category)});return o}
+function el(t,c,h){var e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e}
+function two(b,fn){var o=b.textContent;b.onclick=function(){if(b.dataset.a){fn();return}b.dataset.a=1;b.textContent="Tap again to confirm";setTimeout(function(){delete b.dataset.a;b.textContent=o},3000)}}
+var TABS=[["p","Products"],["c","Categories"],["s","Settings"]];
+function render(){var N=$("nav");N.innerHTML="";TABS.forEach(function(t){var b=el("button","",t[1]);b.setAttribute("aria-current",t[0]===tab);b.onclick=function(){tab=t[0];render()};N.appendChild(b)});
+$("ttl").textContent=TABS.filter(function(t){return t[0]===tab})[0][1];var B=$("body");B.innerHTML="";
+if(tab==="p")prod(B);else if(tab==="c")catg(B);else sett(B)}
+/* products */
+function prod(B){var tb=el("div","tb"),sel=el("select","","<option value=''>All categories</option>"+cats().map(function(c){return"<option"+(c===fc?" selected":"")+">"+esc(c)+"</option>"}).join(""));
+sel.onchange=function(){fc=sel.value;render()};
+var s=el("input");s.type="text";s.placeholder="Search products";s.value=q;s.oninput=function(){q=s.value;list(L)};
+var add=el("button","btn p","+ Add product");add.onclick=function(){edit(null)};tb.append(sel,s,add);B.appendChild(tb);var L=el("div");B.appendChild(L);list(L)}
+function list(L){L.innerHTML="";var n=0;P.forEach(function(r){if(fc&&r.category!==fc)return;if(q&&r.name.toLowerCase().indexOf(q.toLowerCase())<0)return;n++;
+var d=el("div","row"),t=r.image_url?'<img class="th" alt="" src="'+esc(iu(r.image_url))+'">':'<div class="th">'+esc(r.emoji)+'</div>';
+d.innerHTML=t+'<div><b>'+esc(r.name)+'</b><small>'+fmt(r.price)+' · '+esc(r.category)+(r.grp?' · '+esc(r.grp):'')+'</small></div><div class="ac"></div>';
+var a=d.querySelector(".ac"),so=el("label","sold");so.style.margin=0;so.innerHTML='<input type="checkbox" '+(r.sold_out?"checked":"")+' style="width:auto"> Sold out';
+so.querySelector("input").onchange=function(){sb.from("products").update({sold_out:this.checked}).eq("id",r.id).then(function(x){if(x.error)say("Could not save.");else{r.sold_out=!r.sold_out;say("Saved.")}})};
+var u=el("button","btn","↑"),dn=el("button","btn","↓"),ed=el("button","btn","Edit");u.setAttribute("aria-label","Move up");dn.setAttribute("aria-label","Move down");
+u.onclick=function(){mv(r,-1)};dn.onclick=function(){mv(r,1)};ed.onclick=function(){edit(r)};a.append(so,u,dn,ed);L.appendChild(d)});
+if(!n)L.appendChild(el("p","msg","No products found."))}
+function mv(r,d){var Ls=P.filter(function(x){return x.category===r.category}).sort(function(a,b){return a.sort-b.sort}),i=Ls.indexOf(r),j=i+d;if(j<0||j>=Ls.length)return;
+Ls.splice(j,0,Ls.splice(i,1)[0]);Promise.all(Ls.map(function(x,k){return x.sort!==k?sb.from("products").update({sort:k}).eq("id",x.id):null}).filter(Boolean)).then(load)}
+function shrink(f){return new Promise(function(ok,no){var u=URL.createObjectURL(f),im=new Image();im.onload=function(){var s=Math.min(im.width,im.height),c=document.createElement("canvas");c.width=c.height=600;c.getContext("2d").drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,600,600);URL.revokeObjectURL(u);c.toBlob(function(b){b?ok(b):no()},"image/jpeg",.82)};im.onerror=no;im.src=u})}
+function edit(r){var M=$("modal"),C=$("mc"),isNew=!r;r=r||{name:"",description:"",price:0,category:fc||cats()[0]||"",grp:"",emoji:"🥤",image_url:"",sold_out:false};
+C.innerHTML='<h2>'+(isNew?"Add product":"Edit product")+'</h2><label>Name</label><input type="text" id="fn"><label>Description</label><input type="text" id="fd"><label>Price (₦)</label><input type="number" id="fp" min="0" inputmode="numeric"><label>Category (type a new one to create it)</label><input type="text" id="fc" list="cl"><datalist id="cl">'+cats().map(function(c){return"<option value=\""+esc(c)+"\">"}).join("")+'</datalist><label>Section heading inside the category (optional)</label><input type="text" id="fg"><label>Emoji (shown when there is no photo)</label><input type="text" id="fe" style="max-width:120px"><label>Photo</label><div class="ac" style="justify-content:flex-start"><img class="th" id="fi" alt="" hidden><input type="file" id="ff" accept="image/*"></div><label class="chk" id="fr" hidden><input type="checkbox" id="frc"> Remove current photo</label><label class="chk"><input type="checkbox" id="fs"> Sold out</label><p class="err" id="fe2"></p><div class="ac" style="justify-content:flex-start"><button class="btn p" id="sv">Save</button><button class="btn" id="cx">Cancel</button><button class="btn" id="dl" hidden>Delete</button></div>';
+$("fn").value=r.name;$("fd").value=r.description;$("fp").value=r.price;$("fc").value=r.category;$("fg").value=r.grp;$("fe").value=r.emoji;$("fs").checked=r.sold_out;
+if(r.image_url){$("fi").src=iu(r.image_url);$("fi").hidden=false;$("fr").hidden=false}
+M.hidden=false;$("cx").onclick=function(){M.hidden=true};
+if(!isNew){$("dl").hidden=false;two($("dl"),function(){sb.from("products").delete().eq("id",r.id).then(function(x){M.hidden=true;if(x.error)say("Could not delete.");else{say("Deleted.");load()}})})}
+$("sv").onclick=async function(){var E=$("fe2");E.textContent="";var name=$("fn").value.trim(),cat=$("fc").value.trim();if(!name||!cat){E.textContent="Name and category are required.";return}
+this.disabled=true;this.textContent="Saving…";var url=r.image_url;
+try{if($("frc").checked)url="";var f=$("ff").files[0];if(f){var bl=await shrink(f),path="products/"+Date.now().toString(36)+Math.random().toString(36).slice(2,6)+".jpg",up=await sb.storage.from("product-images").upload(path,bl,{contentType:"image/jpeg"});if(up.error)throw up.error;url=sb.storage.from("product-images").getPublicUrl(path).data.publicUrl}
+var same=P.filter(function(x){return x.category===cat}),o={name:name,description:$("fd").value.trim(),price:Number($("fp").value)||0,category:cat,grp:$("fg").value.trim(),emoji:$("fe").value.trim()||"🥤",image_url:url,sold_out:$("fs").checked};
+if(isNew||r.category!==cat){o.category_order=same.length?same[0].category_order:(P.reduce(function(m,x){return Math.max(m,x.category_order)},-1)+1);o.sort=same.reduce(function(m,x){return Math.max(m,x.sort)},-1)+1}
+var res=isNew?await sb.from("products").insert(o):await sb.from("products").update(o).eq("id",r.id);if(res.error)throw res.error;
+M.hidden=true;say("Saved. The shop is updated.");load()}catch(e){E.textContent="Could not save: "+(e.message||"error");this.disabled=false;this.textContent="Save"}}}
+/* categories */
+function saveS(){return sb.from("settings").upsert({key:"shop",value:S})}
+function catg(B){var cs=cats();B.appendChild(el("p","msg","To create a new category, add a product and type the new category name."));
+cs.forEach(function(c,i){var d=el("div","card"),n=P.filter(function(r){return r.category===c}).length;
+d.innerHTML='<label>Category name ('+n+' products)</label><input type="text" value="'+esc(c)+'"><label class="chk"><input type="checkbox" '+((S.topping_categories||[]).indexOf(c)>-1?"checked":"")+'> Offer toppings</label><div class="ac" style="justify-content:flex-start;margin-top:10px"></div>';
+var inp=d.querySelector("input"),ck=d.querySelectorAll("input")[1],a=d.querySelector(".ac"),rn=el("button","btn p","Save name"),u=el("button","btn","↑"),dn=el("button","btn","↓"),dl=el("button","btn","Delete category");
+rn.onclick=function(){var nn=inp.value.trim();if(!nn||nn===c)return;sb.from("products").update({category:nn}).eq("category",c).then(function(x){if(x.error){say("Could not rename.");return}S.topping_categories=(S.topping_categories||[]).map(function(t){return t===c?nn:t});saveS().then(function(){say("Renamed.");load()})})};
+ck.onchange=function(){var t=(S.topping_categories||[]).filter(function(x){return x!==c});if(ck.checked)t.push(c);S.topping_categories=t;saveS().then(function(x){say(x.error?"Could not save.":"Saved.")})};
+function move(dd){var j=i+dd;if(j<0||j>=cs.length)return;var o=cs.slice();o.splice(j,0,o.splice(i,1)[0]);Promise.all(o.map(function(nm,k){return sb.from("products").update({category_order:k}).eq("category",nm)})).then(load)}
+u.onclick=function(){move(-1)};dn.onclick=function(){move(1)};
+two(dl,function(){if(n){say("Move or delete this category’s products first.");return}load()});
+a.append(rn,u,dn);if(!n)a.appendChild(dl);B.appendChild(d)})}
+/* settings */
+function sett(B){var d=el("div","card");d.innerHTML='<label>WhatsApp number for orders (with country code, digits only)</label><input type="tel" id="sw"><label>Delivery fee (₦, enter 0 for free delivery)</label><input type="number" id="sd" min="0" inputmode="numeric"><label>Toppings (separate with commas)</label><input type="text" id="st"><label>Price per topping (₦)</label><input type="number" id="sp" min="0" inputmode="numeric"><div class="ac" style="justify-content:flex-start;margin-top:12px"><button class="btn p" id="ss">Save settings</button></div>';
+B.appendChild(d);$("sw").value=S.whatsapp||"";$("sd").value=S.delivery_fee!=null?S.delivery_fee:1500;$("st").value=(S.toppings||[]).join(", ");$("sp").value=S.topping_price||0;
+$("ss").onclick=function(){var w=$("sw").value.replace(/\D/g,"");if(w.length<10){say("Enter a valid WhatsApp number.");return}S.whatsapp=w;S.toppings=$("st").value.split(",").map(function(x){return x.trim()}).filter(Boolean);S.topping_price=Number($("sp").value)||0;S.delivery_fee=Number($("sd").value)||0;saveS().then(function(x){say(x.error?"Could not save.":"Settings saved.")})};
+var p=el("div","card");p.innerHTML='<label>Change password</label><input type="password" id="np" autocomplete="new-password" placeholder="New password (at least 8 characters)"><div class="ac" style="justify-content:flex-start;margin-top:12px"><button class="btn" id="cp">Update password</button></div>';B.appendChild(p);
+$("cp").onclick=function(){var v=$("np").value;if(v.length<8){say("Use at least 8 characters.");return}sb.auth.updateUser({password:v}).then(function(x){say(x.error?"Could not change password.":"Password changed.");if(!x.error)$("np").value=""})}}
+document.addEventListener("keydown",function(e){if(e.key==="Escape")$("modal").hidden=true});
+</script>
+</body>
+</html>
